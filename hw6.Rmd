@@ -5,6 +5,36 @@ date: "April 22, 2019"
 output: html_document
 ---
 
+1) Importing and cleaning data
 ```{r}
+library(readxl)
+library(dplyr)
+library(ggplot2)
 
+bisfull <- read_xlsx("best_in_show.xlsx", sheet = "Best in show full sheet")
+
+colnames(bisfull)<-bisfull[2,]
+colnames(bisfull)[1]<-bisfull[3,1]
+colnames(bisfull)[4]<-'1 popularity in us'
+bisfull <- bisfull[,-c(2,4,10,21,22,27,32,33,43,45,58, 69, 70, 71, 72)]
+bisfull <- bisfull[,-c(58:60)]
+bisfull <- bisfull[,-c(20,25,29,39,51)]
+bisfull<- bisfull[-c(1,2,3),]
+bisfull <- bisfull[,-4]
+str(bisfull)
 ```
+
+```{r}
+bisfull <- bisfull  %>% mutate(`datadog score` = as.numeric(bisfull$`datadog score`))
+bisfull <- bisfull  %>% mutate(`weight (lbs)` = as.numeric(bisfull$`weight (lbs)`))
+bisfull <- bisfull  %>% mutate(`POPULAR RATING` = as.numeric(bisfull$`POPULAR RATING`))
+bis <- bisfull %>% select(`Dog breed`, category, `datadog score`, `POPULAR RATING`, `intelligence category`, `weight (lbs)`)
+head(bis)
+```
+
+2) Generating Graph
+```{r}
+ggplot(bis, aes(x = `datadog score`, y = `POPULAR RATING`, colour=factor(category), size = `weight (lbs)`, shape = factor(`intelligence category`), label = factor(`Dog breed`))) + geom_point() + geom_label()
+```
+
+
